@@ -1,5 +1,6 @@
 {
     "name": "arafatkn/wrest",
+    "version": "0.0.1",
     "description": "WREST - easy to use REST API wrapper for WordPress",
     "keywords": ["wp rest"],
     "homepage": "https://github.com/arafatkn/wrest",
