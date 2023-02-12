@@ -2,10 +2,12 @@
 
 namespace Arafatkn\WRest\Routing;
 
-use Closure;
+use Arafatkn\WRest\Helpers\RouterMethodHelper;
 
 class Router
 {
+	use RouterMethodHelper;
+
 	private $namespace = '';
 
 	private static $_instance;
@@ -51,103 +53,6 @@ class Router
 	}
 
 	/**
-	 * Register a new GET route with the router.
-	 *
-	 * @param  string  $uri
-	 * @param  array|string|callable|null  $action
-	 * @return Route
-	 */
-	public function get($uri, $action = null)
-	{
-		return $this->addRoute(['GET', 'HEAD'], $uri, $action);
-	}
-
-	/**
-	 * Register a new POST route with the router.
-	 *
-	 * @param  string  $uri
-	 * @param  array|string|callable|null  $action
-	 * @return Route
-	 */
-	public function post($uri, $action = null)
-	{
-		return $this->addRoute('POST', $uri, $action);
-	}
-
-	/**
-	 * Register a new PUT route with the router.
-	 *
-	 * @param  string  $uri
-	 * @param  array|string|callable|null  $action
-	 * @return Route
-	 */
-	public function put($uri, $action = null)
-	{
-		return $this->addRoute('PUT', $uri, $action);
-	}
-
-	/**
-	 * Register a new PATCH route with the router.
-	 *
-	 * @param  string  $uri
-	 * @param  array|string|callable|null  $action
-	 * @return Route
-	 */
-	public function patch($uri, $action = null)
-	{
-		return $this->addRoute('PATCH', $uri, $action);
-	}
-
-	/**
-	 * Register a new DELETE route with the router.
-	 *
-	 * @param  string  $uri
-	 * @param  array|string|callable|null  $action
-	 * @return Route
-	 */
-	public function delete($uri, $action = null)
-	{
-		return $this->addRoute('DELETE', $uri, $action);
-	}
-
-	/**
-	 * Register a new OPTIONS route with the router.
-	 *
-	 * @param  string  $uri
-	 * @param  array|string|callable|null  $action
-	 * @return Route
-	 */
-	public function options($uri, $action = null)
-	{
-		return $this->addRoute('OPTIONS', $uri, $action);
-	}
-
-	/**
-	 * Register a new route responding to all verbs.
-	 *
-	 * @param  string  $uri
-	 * @param  array|string|callable|null  $action
-	 * @return Route
-	 */
-	public function any($uri, $action = null)
-	{
-		return $this->addRoute(self::$verbs, $uri, $action);
-	}
-
-	/**
-	 * Register a new route with the given verbs.
-	 *
-	 * @param  array|string  $methods
-	 * @param  string  $uri
-	 * @param  array|string|callable|null  $action
-	 * @return Route
-	 */
-	public function match($methods, $uri, $action = null)
-	{
-		return $this->addRoute($methods, $uri, $action);
-	}
-
-	/**
 	 * Get the prefix from the last group on the stack.
 	 *
 	 * @return string
@@ -157,7 +62,7 @@ class Router
 		if ($this->hasGroupStack()) {
 			$last = end($this->groupStack);
 
-			return $last['prefix'] ?? '';
+			return isset($last['prefix']) ? $last['prefix'] : '';
 		}
 
 		return '';
@@ -175,21 +80,21 @@ class Router
 	{
 		return $this->routes->add($this->createRoute($methods, $uri, $action));
 
-		if (is_string($action) && strstr($action, '@') !== false) {
-			$action = explode('@', $action, 2);
-		}
-
-		$methods = strtoupper(is_array($methods) ? implode(',', $methods) : $methods);
-
-		$this->routes[] = [
-			'methods'             => $methods,
-			'uri' => $uri,
-			'callback'            => $action,
-			'permission_callback' => [ $this, 'permission_check' ],
-			//'args'                => $args
-		];
-
-		return $this;
+//		if (is_string($action) && strstr($action, '@') !== false) {
+//			$action = explode('@', $action, 2);
+//		}
+//
+//		$methods = strtoupper(is_array($methods) ? implode(',', $methods) : $methods);
+//
+//		$this->routes[] = [
+//			'methods'             => $methods,
+//			'uri' => $uri,
+//			'callback'            => $action,
+//			'permission_callback' => [ $this, 'permission_check' ],
+//			//'args'                => $args
+//		];
+//
+//		return $this;
 	}
 
 	/**
@@ -202,13 +107,6 @@ class Router
 	 */
 	protected function createRoute($methods, $uri, $action)
 	{
-		// If the route is routing to a controller we will parse the route action into
-		// an acceptable array format before registering it and creating this route
-		// instance itself. We need to build the Closure that will call this out.
-		if ($this->actionReferencesController($action)) {
-			$action = $this->convertToControllerAction($action);
-		}
-
 		$route = $this->newRoute(
 			$methods, $this->prefix($uri), $action
 		);
@@ -216,28 +114,13 @@ class Router
 		// If we have groups that need to be merged, we will merge them now after this
 		// route has already been created and is ready to go. After we're done with
 		// the merge we will be ready to return the route back out to the caller.
-		if ($this->hasGroupStack()) {
+		//if ($this->hasGroupStack()) {
 			//$this->mergeGroupAttributesIntoRoute($route);
-		}
+		//}
 
 		//$this->addWhereClausesToRoute($route);
 
 		return $route;
-	}
-
-	/**
-	 * Determine if the action is routing to a controller.
-	 *
-	 * @param  mixed  $action
-	 * @return bool
-	 */
-	protected function actionReferencesController($action)
-	{
-		if (! $action instanceof Closure) {
-			return is_string($action) || (isset($action['uses']) && is_string($action['uses']));
-		}
-
-		return false;
 	}
 
 	/**
@@ -269,34 +152,6 @@ class Router
 	public function getGroupStack()
 	{
 		return $this->groupStack;
-	}
-
-	/**
-	 * Add a controller based route action to the action array.
-	 *
-	 * @param  array|string  $action
-	 * @return array
-	 */
-	protected function convertToControllerAction($action)
-	{
-		if (is_string($action)) {
-			$action = ['uses' => $action];
-		}
-
-		// Here we'll merge any group "controller" and "uses" statements if necessary so that
-		// the action has the proper clause for this property. Then, we can simply set the
-		// name of this controller on the action plus return the action array for usage.
-		if ($this->hasGroupStack()) {
-			$action['uses'] = $this->prependGroupController($action['uses']);
-			$action['uses'] = $this->prependGroupNamespace($action['uses']);
-		}
-
-		// Here we will set this controller name on the action array just so we always
-		// have a copy of it for reference if we need it. This can be used while we
-		// search for a controller name or do some other type of fetch operation.
-		$action['controller'] = $action['uses'];
-
-		return $action;
 	}
 
 	/**
@@ -354,15 +209,17 @@ class Router
 
 	public function registerAll()
 	{
-		foreach ($this->routes as $route) {
-//			register_rest_route( '', $uri, [
-//				[
-//					'methods'             => $methods,
-//					'callback'            => $action,
-//					'permission_callback' => [ $this, 'permission_check' ],
-//					//'args'                => $args
-//				]
-//			] );
+		foreach ($this->routes->getRoutesByMethod() as $method => $routes) {
+			foreach ($routes as $route) {
+				register_rest_route( '', $route->uri, [
+					[
+						'methods'             => $method,
+						'callback'            => $route->action,
+						//'permission_callback' => [ $this, 'permission_check' ],
+						//'args'                => $args
+					]
+				] );
+			}
 		}
 	}
 }
