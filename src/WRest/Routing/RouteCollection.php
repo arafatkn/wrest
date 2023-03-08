@@ -2,8 +2,6 @@
 
 namespace Arafatkn\WRest\Routing;
 
-use Arafatkn\WRest\Helpers\Arr;
-
 class RouteCollection
 {
 	/**

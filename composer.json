@@ -1,20 +1,29 @@
 {
     "name": "arafatkn/wrest",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "description": "WREST - easy to use REST API wrapper for WordPress",
     "keywords": ["wp rest"],
     "homepage": "https://github.com/arafatkn/wrest",
     "type": "library",
     "license": "MIT",
     "autoload": {
+        "files": [
+            "src/functions.php"
+        ],
         "psr-4": {
-            "Arafatkn\\WRest\\": "src/"
+            "Arafatkn\\WRest\\": "src/WRest"
         }
     },
     "autoload-dev": {
         "psr-4": {
             "Arafatkn\\WRest\\Tests\\": "tests/"
         }
+    },
+    "require": {
+        "php": ">=5.6"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10"
     },
     "authors": [
         {
@@ -26,10 +35,8 @@
             "email": "tareq@wedevs.com"
         }
     ],
-    "require": {
-        "php": ">=5.6"
-    },
-    "require-dev": {
-        "phpunit/phpunit": "^10"
+    "support": {
+        "issues": "https://github.com/arafatkn/wrest/issues",
+        "source": "https://github.com/arafatkn/wrest"
     }
 }

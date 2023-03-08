@@ -10,9 +10,11 @@ if (!function_exists('wrest')) {
 	}
 }
 
-add_action( 'rest_api_init', function () {
-	wrest()->registerAll();
-});
+if (function_exists('add_action')) {
+	add_action( 'rest_api_init', function () {
+		wrest()->registerAll();
+	});
+}
 
 if (! function_exists('value')) {
 	/**
