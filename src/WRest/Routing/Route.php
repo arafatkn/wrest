@@ -16,9 +16,10 @@ class Route
 
 	protected $router;
 
-	public function __construct($methods, $uri, $action)
+	public function __construct($methods, $namespace, $uri, $action)
 	{
 		$this->methods = (array) $methods;
+		$this->namespace = $namespace;
 		$this->uri = $uri;
 		$this->action = $action;
 

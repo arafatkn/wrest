@@ -15,7 +15,7 @@ trait RouterMethodHelper
 	 */
 	public function get($uri, $action = null)
 	{
-		return $this->addRoute(['GET', 'HEAD'], $uri, $action);
+		return $this->addRoute('GET', $uri, $action);
 	}
 
 	/**
@@ -67,18 +67,6 @@ trait RouterMethodHelper
 	}
 
 	/**
-	 * Register a new OPTIONS route with the router.
-	 *
-	 * @param  string  $uri
-	 * @param  array|string|callable|null  $action
-	 * @return Route
-	 */
-	public function options($uri, $action = null)
-	{
-		return $this->addRoute('OPTIONS', $uri, $action);
-	}
-
-	/**
 	 * Register a new route responding to all verbs.
 	 *
 	 * @param  string  $uri
@@ -100,6 +88,13 @@ trait RouterMethodHelper
 	 */
 	public function match($methods, $uri, $action = null)
 	{
+		if (!is_array($methods)) {
+			$methods = explode(',', $methods);
+		}
+
+		$methods = array_map('trim', $methods);
+		$methods = array_map('strtoupper', $methods);
+
 		return $this->addRoute($methods, $uri, $action);
 	}
 }

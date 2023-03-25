@@ -17,7 +17,7 @@ class Router
 	 *
 	 * @var string[]
 	 */
-	public static $verbs = ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'];
+	public static $verbs = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'];
 
 	public $routes;
 
@@ -44,12 +44,25 @@ class Router
 		return self::resolveInstance()->$name(...$arguments);
 	}
 
-	public function group($namespace, $callback)
+	public function setNamespace($namespace)
+	{
+		$this->namespace = $namespace;
+	}
+
+	public function usingNamespace($namespace, $callback)
 	{
 		$old_namespace = $this->namespace;
-		$this->namespace .= $namespace;
+		$this->namespace = $namespace;
 		$callback($this);
 		$this->namespace = $old_namespace;
+	}
+
+	public function group($group, $callback)
+	{
+		$old = $this->groupStack;
+		$this->groupStack[] = $group;
+		$callback($this);
+		$this->groupStack = $old;
 	}
 
 	/**
@@ -78,38 +91,28 @@ class Router
 	 */
 	public function addRoute($methods, $uri, $action)
 	{
-		return $this->routes->add($this->createRoute($methods, $uri, $action));
+		// Support for the "Controller@method" syntax.
+		// Method have to be static.
+		if (is_string($action) && strstr($action, '@') !== false) {
+			$action = explode('@', $action, 2);
+		}
 
-//		if (is_string($action) && strstr($action, '@') !== false) {
-//			$action = explode('@', $action, 2);
-//		}
-//
-//		$methods = strtoupper(is_array($methods) ? implode(',', $methods) : $methods);
-//
-//		$this->routes[] = [
-//			'methods'             => $methods,
-//			'uri' => $uri,
-//			'callback'            => $action,
-//			'permission_callback' => [ $this, 'permission_check' ],
-//			//'args'                => $args
-//		];
-//
-//		return $this;
+		return $this->routes->add($this->createRoute($methods, $this->namespace, $uri, $action));
 	}
 
 	/**
 	 * Create a new route instance.
 	 *
 	 * @param  array|string  $methods
+	 * @param  string  $namespace
 	 * @param  string  $uri
 	 * @param  mixed  $action
 	 * @return Route
 	 */
-	protected function createRoute($methods, $uri, $action)
+	protected function createRoute($methods, $namespace, $uri, $action)
 	{
-		$route = $this->newRoute(
-			$methods, $this->prefix($uri), $action
-		);
+		$route = (new Route($methods, $namespace, $uri, $action))
+			->setRouter($this);
 
 		// If we have groups that need to be merged, we will merge them now after this
 		// route has already been created and is ready to go. After we're done with
@@ -155,20 +158,6 @@ class Router
 	}
 
 	/**
-	 * Prepend the last group namespace onto the use clause.
-	 *
-	 * @param  string  $class
-	 * @return string
-	 */
-	protected function prependGroupNamespace($class)
-	{
-		$group = end($this->groupStack);
-
-		return isset($group['namespace']) && strpos($class, '\\') !== 0
-			? $group['namespace'].'\\'.$class : $class;
-	}
-
-	/**
 	 * Prepend the last group controller onto the use clause.
 	 *
 	 * @param  string  $class
@@ -193,33 +182,19 @@ class Router
 		return $group['controller'].'@'.$class;
 	}
 
-	/**
-	 * Create a new Route object.
-	 *
-	 * @param  array|string  $methods
-	 * @param  string  $uri
-	 * @param  mixed  $action
-	 * @return Route
-	 */
-	public function newRoute($methods, $uri, $action)
-	{
-		return (new Route($methods, $uri, $action))
-			->setRouter($this);
-	}
-
 	public function registerAll()
 	{
-		foreach ($this->routes->getRoutesByMethod() as $method => $routes) {
-			foreach ($routes as $route) {
-				register_rest_route( '', $route->uri, [
-					[
-						'methods'             => $method,
-						'callback'            => $route->action,
-						//'permission_callback' => [ $this, 'permission_check' ],
-						//'args'                => $args
-					]
-				] );
-			}
+		foreach ($this->routes->getRoutes() as $route) {
+			//echo json_encode($route) . '<br/>';
+
+			register_rest_route($route->namespace, $route->uri, [
+				[
+					'methods'             => $route->methods,
+					'callback'            => $route->action,
+					//'permission_callback' => [ $this, 'permission_check' ],
+					//'args'                => $args
+				]
+			]);
 		}
 	}
 }
