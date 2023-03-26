@@ -1,8 +1,8 @@
 {
     "name": "arafatkn/wrest",
-    "version": "0.0.2",
+    "version": "0.0.1",
     "description": "WREST - easy to use REST API wrapper for WordPress",
-    "keywords": ["wp rest"],
+    "keywords": ["wp rest", "wp rest api", "wp rest api wrapper", "wordpress rest api"],
     "homepage": "https://github.com/arafatkn/wrest",
     "type": "library",
     "license": "MIT",
@@ -29,10 +29,6 @@
         {
             "name": "Arafat Islam",
             "email": "arafatkn@gmail.com"
-        },
-        {
-            "name": "Tareq Hasan",
-            "email": "tareq@wedevs.com"
         }
     ],
     "support": {
