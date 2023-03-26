@@ -49,6 +49,11 @@ class Router
 		$this->namespace = $namespace;
 	}
 
+	public function clearNamespace()
+	{
+		$this->namespace = '';
+	}
+
 	public function usingNamespace($namespace, $callback)
 	{
 		$old_namespace = $this->namespace;
