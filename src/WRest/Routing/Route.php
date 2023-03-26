@@ -14,6 +14,8 @@ class Route
 
 	public $action;
 
+	public $permission;
+
 	protected $router;
 
 	public function __construct($methods, $namespace, $uri, $action)
@@ -22,10 +24,6 @@ class Route
 		$this->namespace = $namespace;
 		$this->uri = $uri;
 		$this->action = $action;
-
-		if (in_array('GET', $this->methods) && ! in_array('HEAD', $this->methods)) {
-			$this->methods[] = 'HEAD';
-		}
 	}
 
 	/**
@@ -67,6 +65,25 @@ class Route
 	public function setRouter(Router $router)
 	{
 		$this->router = $router;
+
+		return $this;
+	}
+
+	/**
+	 * Set Permission checker for this route.
+	 *
+	 * @param string|callable $checker
+	 * @return $this
+	 */
+	public function permission($checker)
+	{
+		if (is_string($checker)) {
+			$this->permission = function () use ($checker) {
+				return current_user_can($checker);
+			};
+		} else {
+			$this->permission = $checker;
+		}
 
 		return $this;
 	}

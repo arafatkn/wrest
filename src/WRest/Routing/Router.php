@@ -191,7 +191,7 @@ class Router
 				[
 					'methods'             => $route->methods,
 					'callback'            => $route->action,
-					//'permission_callback' => [ $this, 'permission_check' ],
+					'permission_callback' => empty($route->permission) ? '__return_true' : $route->permission,
 					//'args'                => $args
 				]
 			]);
