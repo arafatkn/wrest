@@ -16,6 +16,10 @@ class Route
 
 	public $permission;
 
+	public $params = [];
+
+	public $args = [];
+
 	protected $router;
 
 	public function __construct($methods, $namespace, $uri, $action)
@@ -83,6 +87,55 @@ class Route
 			};
 		} else {
 			$this->permission = $checker;
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Set a regular expression requirement on the route.
+	 *
+	 * @param  array|string  $name
+	 * @param  string|null  $expression
+	 * @return $this
+	 */
+	public function param($name, $expression = null)
+	{
+		$params = is_array($name) ? $name : [$name => $expression];
+
+		foreach ($params as $name => $expression) {
+			$this->params[$name] = $expression;
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Set args
+	 *
+	 * @param array $args
+	 */
+	public function args($args) {
+		foreach ($args as $name => $rules) {
+			$this->args[$name] = $rules;
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Set argument on the route.
+	 *
+	 * @param  array|string  $name
+	 * @param  array  $rules
+	 * @return $this
+	 */
+	public function arg($name, $rules = null)
+	{
+		$params = is_array($name) ? $name : [$name => $rules];
+
+		foreach ($params as $name => $rules) {
+			$this->args[$name] = $rules;
 		}
 
 		return $this;

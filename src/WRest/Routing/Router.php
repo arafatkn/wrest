@@ -186,13 +186,23 @@ class Router
 	{
 		foreach ($this->routes->getRoutes() as $route) {
 			//echo json_encode($route) . '<br/>';
+			$uri = preg_replace_callback(
+				'/\{(\w+?)\}/',
+				function ($matches) use($route) {
+					$expression = isset($route->params[$matches[1]]) ? $route->params[$matches[1]] : '[^/]+';
+					//$optional = strpos($matches[0], '?') !== false ? '?' : '';
+					// No Support for optional currently.
+					return '(?P<' . $matches[1] . '>' . $expression . ')';
+				},
+				$route->uri
+			);
 
-			register_rest_route($route->namespace, $route->uri, [
+			register_rest_route($route->namespace, $uri, [
 				[
 					'methods'             => $route->methods,
 					'callback'            => $route->action,
 					'permission_callback' => empty($route->permission) ? '__return_true' : $route->permission,
-					//'args'                => $args
+					'args'                => $route->args,
 				]
 			]);
 		}
