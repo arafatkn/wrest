@@ -1,11 +1,18 @@
+![WREST](https://banners.beyondco.de/WREST.png?theme=light&packageManager=composer+require&packageName=arafatkn%2Fwrest&pattern=architect&style=style_1&description=Easy+to+use+fluent+REST+API+wrapper+for+WordPress.&md=1&showWatermark=0&fontSize=100px&images=code)
+
 # WREST (WordPress REST)
-
-![Latest Stable Version](https://poser.pugx.org/arafatkn/wrest/v)
-![License](https://poser.pugx.org/arafatkn/wrest/license)
-
 WREST - easy to use fluent REST API wrapper for WordPress.
 
+![Latest Stable Version](https://poser.pugx.org/arafatkn/wrest/v)
+[![PHP Version Require](http://poser.pugx.org/arafatkn/wrest/require/php)](https://packagist.org/packages/arafatkn/wrest)
+![License](https://poser.pugx.org/arafatkn/wrest/license)
+[![Total Downloads](https://poser.pugx.org/arafatkn/wrest/downloads)](//packagist.org/packages/arafatkn/wrest)
+
 ## Installation
+
+### Requirements
+- PHP >= 5.6
+- WordPress >= 4.4
 
 You can install wRest in two ways, via composer and manually.
 
